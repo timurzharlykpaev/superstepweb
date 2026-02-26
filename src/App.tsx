@@ -10,9 +10,10 @@ import MapPage from './pages/app/MapPage'
 import SettingsPage from './pages/app/SettingsPage'
 import LanguagePage from './pages/onboarding/LanguagePage'
 import ShowcasePage from './pages/onboarding/ShowcasePage'
-import GoalPage from './pages/onboarding/GoalPage'
+import GoalInputPage from './pages/onboarding/GoalInputPage'
 import ProcessingPage from './pages/onboarding/ProcessingPage'
 import ResultPage from './pages/onboarding/ResultPage'
+import SubscriptionPage from './pages/onboarding/SubscriptionPage'
 
 export default function App() {
   return (
@@ -25,9 +26,10 @@ export default function App() {
         <Route index element={<Navigate to="/onboarding/language" replace />} />
         <Route path="language" element={<LanguagePage />} />
         <Route path="showcase" element={<ShowcasePage />} />
-        <Route path="goal" element={<GoalPage />} />
+        <Route path="goal" element={<GoalInputPage />} />
         <Route path="processing" element={<ProcessingPage />} />
         <Route path="result" element={<ResultPage />} />
+        <Route path="subscription" element={<SubscriptionPage />} />
       </Route>
 
       {/* Main app — requires auth + completed onboarding */}
