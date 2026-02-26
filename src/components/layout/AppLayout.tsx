@@ -1,5 +1,6 @@
 import { Outlet, NavLink } from 'react-router-dom'
 import { SquaresFour, ListChecks, Star, Crosshair, User } from '@phosphor-icons/react'
+import ThemeToggle from '../ThemeToggle'
 
 const navItems = [
   { to: '/app/today', label: 'Home',     Icon: SquaresFour },
@@ -13,14 +14,14 @@ export default function AppLayout() {
   return (
     <div className="flex h-screen bg-[#0D0D0D] text-white overflow-hidden">
       {/* Sidebar - desktop */}
-      <aside className="hidden md:flex flex-col w-64 bg-[#1a1a1a] border-r border-white/5 py-6 px-4">
+      <aside className="hidden md:flex flex-col w-64 border-r border-black/5 dark:border-white/5 py-6 px-4" style={{ backgroundColor: 'var(--color-surface)' }}>
         <div className="flex items-center gap-3 mb-8 px-2">
           <img src="/logo.png" alt="StepToGoal" className="w-8 h-8 rounded-xl" />
           <span className="text-xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
             StepToGoal
           </span>
         </div>
-        <nav className="flex-1 space-y-1">
+        <nav className="flex-1 space-y-1 mb-4">
           {navItems.map(({ to, label, Icon }) => (
             <NavLink
               key={to}
@@ -42,6 +43,9 @@ export default function AppLayout() {
             </NavLink>
           ))}
         </nav>
+        <div className="px-2">
+          <ThemeToggle className="w-full justify-start gap-2" />
+        </div>
       </aside>
 
       {/* Main content */}
@@ -51,7 +55,7 @@ export default function AppLayout() {
         </main>
 
         {/* Bottom nav - mobile */}
-        <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-[#1a1a1a] border-t border-white/5 flex justify-around py-2 z-50">
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 border-t border-black/5 dark:border-white/5 flex justify-around py-2 z-50" style={{ backgroundColor: 'var(--color-surface)' }}>
           {navItems.map(({ to, label, Icon }) => (
             <NavLink
               key={to}

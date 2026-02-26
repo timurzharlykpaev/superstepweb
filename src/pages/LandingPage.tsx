@@ -4,6 +4,7 @@ import {
   Star, Crosshair, Microphone, Globe,
   Lightning, ArrowRight,
 } from '@phosphor-icons/react'
+import ThemeToggle from '../components/ThemeToggle'
 import { LS_STORE_URL, LS_VARIANT_MONTHLY, LS_VARIANT_YEARLY } from '../constants/config'
 
 const features = [
@@ -84,14 +85,14 @@ export default function LandingPage() {
   const yearlyCheckout = `${LS_STORE_URL}/checkout/buy/${LS_VARIANT_YEARLY}`
 
   return (
-    <div className="min-h-screen bg-[#0D0D0D] text-white overflow-x-hidden">
+    <div className="min-h-screen overflow-x-hidden" style={{ backgroundColor: 'var(--color-background)', color: 'var(--color-text)' }}>
       {/* Background glows */}
       <div className="fixed top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-purple-600/10 rounded-full blur-3xl pointer-events-none" />
       <div className="fixed top-1/3 right-0 w-64 h-64 bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
       <div className="fixed bottom-0 left-0 w-64 h-64 bg-green-600/5 rounded-full blur-3xl pointer-events-none" />
 
       {/* Nav */}
-      <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4 bg-[#0D0D0D]/80 backdrop-blur-md border-b border-white/5">
+      <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4 backdrop-blur-md border-b border-black/5 dark:border-white/5" style={{ backgroundColor: 'color-mix(in srgb, var(--color-background) 85%, transparent)' }}>
         <div className="flex items-center gap-2">
           <img src="/logo.png" alt="StepToGoal" className="w-8 h-8 rounded-xl" />
           <span className="text-xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
@@ -103,9 +104,12 @@ export default function LandingPage() {
           <a href="#pricing" className="hover:text-white transition-colors">Pricing</a>
           <a href="#how-it-works" className="hover:text-white transition-colors">How It Works</a>
         </div>
-        <Link to="/login" className="btn-primary px-4 py-2 rounded-lg text-sm">
-          Open App
-        </Link>
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          <Link to="/login" className="btn-primary px-4 py-2 rounded-lg text-sm">
+            Open App
+          </Link>
+        </div>
       </nav>
 
       {/* Hero */}

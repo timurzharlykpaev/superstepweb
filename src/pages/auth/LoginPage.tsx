@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { GoogleLogin } from '@react-oauth/google'
 import { sendOtp, verifyOtp, googleSignIn } from '../../api/auth'
 import { useAuthStore } from '../../store/authStore'
+import ThemeToggle from '../../components/ThemeToggle'
 
 export default function LoginPage() {
   const navigate = useNavigate()
@@ -63,7 +64,11 @@ export default function LoginPage() {
 
 
   return (
-    <div className="min-h-screen bg-[#0D0D0D] flex items-center justify-center px-4">
+    <div className="min-h-screen flex items-center justify-center px-4" style={{ backgroundColor: 'var(--color-background)' }}>
+      {/* Theme toggle */}
+      <div className="absolute top-4 right-4">
+        <ThemeToggle />
+      </div>
       {/* Background glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl pointer-events-none" />
 
@@ -71,18 +76,18 @@ export default function LoginPage() {
         {/* Logo */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 mb-4">
-            <img src="/logo.png" alt="StepToGoal" className="w-16 h-16 rounded-2xl" />
+            <img src="/icon.png" alt="StepToGoal" className="w-16 h-16 rounded-2xl shadow-lg" />
           </div>
           <h1 className="text-2xl font-bold text-white">StepToGoal</h1>
           <p className="text-gray-400 mt-1">Your goals deserve a plan</p>
         </div>
 
         {/* Card */}
-        <div className="bg-[#1a1a1a] rounded-2xl border border-white/5 p-8">
+        <div className="rounded-2xl border border-black/5 dark:border-white/5 p-8" style={{ backgroundColor: 'var(--color-surface)' }}>
           {step === 'email' ? (
             <>
-              <h2 className="text-xl font-semibold text-white mb-2">Welcome back</h2>
-              <p className="text-gray-400 text-sm mb-6">Sign in to continue your journey</p>
+              <h2 className="text-xl font-semibold mb-2" style={{ color: 'var(--color-text)' }}>Welcome back</h2>
+              <p className="text-sm mb-6" style={{ color: 'var(--color-text-secondary)' }}>Sign in to continue your journey</p>
 
               {/* Google Sign-In */}
               <div className="mb-4">
