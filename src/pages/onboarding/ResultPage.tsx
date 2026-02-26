@@ -16,7 +16,7 @@ export default function ResultPage() {
   }
 
   return (
-    <div className="min-h-screen p-6" style={{ backgroundColor: 'var(--color-background)' }}>
+    <div className="flex flex-col  p-6" style={{ backgroundColor: 'var(--color-background)' }}>
       <div className="max-w-2xl mx-auto">
         <div className="text-center mb-8 pt-8">
           <div className="text-6xl mb-4">🎉</div>

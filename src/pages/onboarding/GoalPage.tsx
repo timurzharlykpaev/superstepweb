@@ -40,7 +40,7 @@ export default function GoalPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col px-6 py-12" style={{ backgroundColor: 'var(--color-background)' }}>
+    <div className="flex flex-col px-6 py-12" style={{ backgroundColor: 'var(--color-background)' }}>
       <div className="flex-1 flex flex-col justify-center max-w-lg mx-auto w-full">
         <div className="text-center mb-8">
           <div className="text-5xl mb-4">🎯</div>

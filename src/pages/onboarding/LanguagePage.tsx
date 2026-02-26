@@ -13,7 +13,7 @@ export default function LanguagePage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-6 py-12" style={{ backgroundColor: 'var(--color-background)' }}>
+    <div className="flex flex-col items-center justify-center px-6 py-12" style={{ backgroundColor: 'var(--color-background)' }}>
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="text-5xl mb-4">🌍</div>

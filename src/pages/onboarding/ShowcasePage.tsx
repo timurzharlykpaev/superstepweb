@@ -31,9 +31,12 @@ export default function ShowcasePage() {
   const current = SLIDES[slide]
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'var(--color-background)' }}>
+    <div
+      className="flex flex-col"
+      style={{ height: '100dvh', backgroundColor: 'var(--color-background)' }}
+    >
       {/* Skip */}
-      <div className="flex justify-end p-4">
+      <div className="flex justify-end px-4 pt-4 flex-shrink-0">
         <button
           onClick={() => navigate('/onboarding/goal')}
           className="text-sm px-4 py-2 rounded-lg transition-colors"
@@ -43,21 +46,25 @@ export default function ShowcasePage() {
         </button>
       </div>
 
-      {/* Slide */}
-      <div className="flex-1 flex flex-col items-center justify-center px-6">
+      {/* Slide — занимает всё оставшееся место */}
+      <div className="flex-1 flex flex-col items-center justify-center px-6 min-h-0">
         <div className="w-full max-w-md text-center">
-          <div className={`bg-gradient-to-b ${current.bg} w-32 h-32 rounded-3xl flex items-center justify-center mx-auto mb-8`}>
+          <div className={`bg-gradient-to-b ${current.bg} w-28 h-28 rounded-3xl flex items-center justify-center mx-auto mb-6`}>
             {current.icon}
           </div>
-          <h1 className="text-3xl font-bold mb-4" style={{ color: 'var(--color-text)' }}>{current.title}</h1>
-          <p className="text-lg leading-relaxed" style={{ color: 'var(--color-text-muted)' }}>{current.subtitle}</p>
+          <h1 className="text-3xl font-bold mb-3" style={{ color: 'var(--color-text)' }}>
+            {current.title}
+          </h1>
+          <p className="text-base leading-relaxed px-2" style={{ color: 'var(--color-text-muted)' }}>
+            {current.subtitle}
+          </p>
         </div>
       </div>
 
-      {/* Bottom */}
-      <div className="p-6 max-w-md mx-auto w-full">
+      {/* Bottom — всегда прижат к низу */}
+      <div className="flex-shrink-0 px-6 pb-8 pt-4 max-w-md mx-auto w-full">
         {/* Dots */}
-        <div className="flex justify-center gap-2 mb-6">
+        <div className="flex justify-center gap-2 mb-5">
           {SLIDES.map((_, i) => (
             <button
               key={i}

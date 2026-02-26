@@ -42,7 +42,7 @@ export default function ProcessingPage() {
   }, [navigate])
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-6" style={{ backgroundColor: 'var(--color-background)' }}>
+    <div className="flex flex-col  flex items-center justify-center px-6" style={{ backgroundColor: 'var(--color-background)' }}>
       <div className="w-full max-w-md text-center">
         <div className="text-8xl mb-8 animate-bounce">🤖</div>
 

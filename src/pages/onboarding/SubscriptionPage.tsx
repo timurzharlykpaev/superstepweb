@@ -20,7 +20,7 @@ export default function SubscriptionPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col p-6" style={{ backgroundColor: 'var(--color-background)' }}>
+    <div className="flex flex-col p-6" style={{ backgroundColor: 'var(--color-background)' }}>
       <div className="flex-1 flex items-center justify-center">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">

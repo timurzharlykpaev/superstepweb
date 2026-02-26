@@ -70,7 +70,7 @@ export default function LoginPage() {
 
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4" style={{ backgroundColor: 'var(--color-background)' }}>
+    <div className="flex flex-col  flex items-center justify-center px-4" style={{ backgroundColor: 'var(--color-background)' }}>
       {/* Theme toggle */}
       <div className="absolute top-4 right-4">
         <ThemeToggle />

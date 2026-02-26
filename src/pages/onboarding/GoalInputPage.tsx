@@ -20,7 +20,7 @@ export default function GoalInputPage() {
   ]
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'var(--color-background)' }}>
+    <div className="flex flex-col" style={{ backgroundColor: 'var(--color-background)' }}>
       <div className="flex justify-end p-4">
         <button
           onClick={() => navigate('/app/today')}
