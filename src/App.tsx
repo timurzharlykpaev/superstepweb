@@ -3,9 +3,11 @@ import LandingPage from './pages/LandingPage'
 import LoginPage from './pages/auth/LoginPage'
 import ProtectedRoute from './components/layout/ProtectedRoute'
 import AppLayout from './components/layout/AppLayout'
+import HomePage from './pages/app/HomePage'
 import TodayPage from './pages/app/TodayPage'
 import ChatPage from './pages/app/ChatPage'
 import GoalsPage from './pages/app/GoalsPage'
+import GoalDetailPage from './pages/app/GoalDetailPage'
 import MapPage from './pages/app/MapPage'
 import SettingsPage from './pages/app/SettingsPage'
 import LanguagePage from './pages/onboarding/LanguagePage'
@@ -43,10 +45,12 @@ export default function App() {
           </ProtectedRoute>
         }
       >
-        <Route index element={<Navigate to="/app/today" replace />} />
+        <Route index element={<Navigate to="/app/home" replace />} />
+        <Route path="home" element={<HomePage />} />
         <Route path="today" element={<TodayPage />} />
         <Route path="chat" element={<ChatPage />} />
         <Route path="goals" element={<GoalsPage />} />
+        <Route path="goals/:id" element={<GoalDetailPage />} />
         <Route path="map" element={<MapPage />} />
         <Route path="settings" element={<SettingsPage />} />
       </Route>

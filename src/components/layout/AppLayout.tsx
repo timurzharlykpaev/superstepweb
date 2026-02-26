@@ -6,8 +6,8 @@ import { SUPPORTED_LANGUAGES, changeLanguage } from '../../i18n'
 import { useTranslation } from 'react-i18next'
 
 const navItems = [
-  { to: '/app/today',    label: 'Home',    Icon: SquaresFour },
-  { to: '/app/chat',     label: 'Chat',    Icon: ListChecks  },
+  { to: '/app/home',     label: 'Home',    Icon: SquaresFour },
+  { to: '/app/today',    label: 'Today',   Icon: ListChecks  },
   { to: '/app/map',      label: 'Wishes',  Icon: Star        },
   { to: '/app/goals',    label: 'Goals',   Icon: Crosshair   },
   { to: '/app/settings', label: 'Profile', Icon: User        },
