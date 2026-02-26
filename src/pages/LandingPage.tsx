@@ -206,13 +206,7 @@ export default function LandingPage() {
               <Lightning size={20} weight="fill" />
               Open Web App
             </Link>
-            <a
-              href="#features"
-              className="inline-flex items-center gap-2 border border-white/20 hover:border-white/40 text-gray-300 hover:text-white font-semibold px-8 py-4 rounded-xl text-lg transition-colors"
-            >
-              Learn More
-              <ArrowRight size={18} />
-            </a>
+
           </div>
           <StoreButtons className="justify-center mt-4" />
 
