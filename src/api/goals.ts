@@ -22,16 +22,16 @@ export interface Plan {
 }
 
 export const getGoals = () =>
-  client.get<{ goals: Goal[] }>('/goals')
+  client.get<Goal[]>('/goals')
 
 export const createGoal = (data: Partial<Goal>) =>
-  client.post<{ goal: Goal }>('/goals', data)
+  client.post<Goal>('/goals', data)
 
 export const updateGoal = (id: string, data: Partial<Goal>) =>
-  client.patch<{ goal: Goal }>(`/goals/${id}`, data)
+  client.patch<Goal>(`/goals/${id}`, data)
 
 export const deleteGoal = (id: string) =>
   client.delete(`/goals/${id}`)
 
 export const getPlans = () =>
-  client.get<{ plans: Plan[] }>('/plans')
+  client.get<Plan[]>('/weekly-plans')

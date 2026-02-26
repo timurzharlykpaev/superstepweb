@@ -21,8 +21,8 @@ export default function MapPage() {
   const { data: wishes = [], isLoading } = useQuery({
     queryKey: ['wishes'],
     queryFn: async () => {
-      const res = await client.get<{ items: WishItem[] }>('/wish-items')
-      return res.data.items || []
+      const res = await client.get<WishItem[]>('/wish-items')
+      return res.data || []
     },
   })
 

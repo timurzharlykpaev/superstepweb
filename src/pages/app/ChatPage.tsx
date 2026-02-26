@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { useQuery, useMutation } from '@tanstack/react-query'
-import { getMessages, sendMessage, type ChatMessage } from '../../api/chat'
+import { getSessions, getSessionMessages, sendMessage, type ChatMessage } from '../../api/chat'
 
 export default function ChatPage() {
   const [input, setInput] = useState('')
@@ -8,12 +8,19 @@ export default function ChatPage() {
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const bottomRef = useRef<HTMLDivElement>(null)
 
+  // Load sessions, then messages of the latest one
   const { isLoading } = useQuery({
-    queryKey: ['chat-messages'],
+    queryKey: ['chat-sessions'],
     queryFn: async () => {
-      const res = await getMessages()
-      setMessages(res.data.messages || [])
-      return res.data.messages
+      const res = await getSessions()
+      const sessions = res.data || []
+      if (sessions.length > 0) {
+        const latest = sessions[0]
+        setSessionId(latest.id)
+        const msgsRes = await getSessionMessages(latest.id)
+        setMessages(msgsRes.data || [])
+      }
+      return sessions
     },
   })
 

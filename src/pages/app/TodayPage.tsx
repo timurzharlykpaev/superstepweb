@@ -24,8 +24,8 @@ export default function TodayPage() {
     queryKey: ['goals'],
     queryFn: async () => {
       const res = await getGoals()
-      setGoals(res.data.goals)
-      return res.data.goals
+      setGoals(res.data || [])
+      return res.data || []
     },
   })
 
