@@ -1,8 +1,20 @@
-import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { getGoals, createGoal } from '../../api/goals'
-import { useGoalsStore } from '../../store/goalsStore'
-const CATEGORY_COLORS: Record<string, string> = {
+import { CheckSquare, Square, CalendarDots, Lightning } from '@phosphor-icons/react'
+import client from '../../api/client'
+
+interface Task {
+  id: string
+  title: string
+  description?: string
+  status: 'pending' | 'completed' | 'skipped'
+  scheduledDate?: string
+  goalId?: string
+  goal?: { title: string; color?: string; category?: string }
+  estimatedMinutes?: number
+  priority?: number
+}
+
+const STATUS_COLORS: Record<string, string> = {
   health: '#10B981',
   career: '#3B82F6',
   education: '#8B5CF6',
@@ -14,188 +26,149 @@ const CATEGORY_COLORS: Record<string, string> = {
 
 export default function TodayPage() {
   const qc = useQueryClient()
-  const setGoals = useGoalsStore((s) => s.setGoals)
-  const goals = useGoalsStore((s) => s.goals)
-  const [showModal, setShowModal] = useState(false)
-  const [newTitle, setNewTitle] = useState('')
-  const [newCategory, setNewCategory] = useState('other')
 
-  const { isLoading } = useQuery({
-    queryKey: ['goals'],
+  const today = new Date().toLocaleDateString('en-US', {
+    weekday: 'long', month: 'long', day: 'numeric',
+  })
+
+  const { data: tasks = [], isLoading } = useQuery({
+    queryKey: ['tasks-today'],
     queryFn: async () => {
-      const res = await getGoals()
-      setGoals(res.data || [])
+      const res = await client.get<Task[]>('/tasks/today')
       return res.data || []
     },
   })
 
-  const createMutation = useMutation({
-    mutationFn: () =>
-      createGoal({
-        title: newTitle,
-        category: newCategory,
-        status: 'active',
-        progress: 0,
-        weight: 3,
-      } as any),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['goals'] })
-      setShowModal(false)
-      setNewTitle('')
-    },
+  const completeMutation = useMutation({
+    mutationFn: (id: string) => client.patch(`/tasks/${id}/complete`),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['tasks-today'] }),
   })
 
-  const today = new Date().toLocaleDateString('en-US', {
-    weekday: 'long',
-    month: 'long',
-    day: 'numeric',
+  const skipMutation = useMutation({
+    mutationFn: (id: string) => client.patch(`/tasks/${id}/skip`),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['tasks-today'] }),
   })
+
+  const pending = tasks.filter((t) => t.status === 'pending')
+  const completed = tasks.filter((t) => t.status === 'completed')
+
+  const progress = tasks.length > 0 ? Math.round((completed.length / tasks.length) * 100) : 0
 
   return (
-    <div className="min-h-full bg-[#0D0D0D] p-6">
+    <div className="min-h-full p-4 md:p-6" style={{ backgroundColor: 'var(--color-background)' }}>
       {/* Header */}
       <div className="mb-6">
-        <p className="text-gray-500 text-sm">{today}</p>
-        <h1 className="text-2xl font-bold text-white">Today's Goals</h1>
+        <p className="text-sm mb-1" style={{ color: 'var(--color-text-muted)' }}>{today}</p>
+        <h1 className="text-2xl font-bold" style={{ color: 'var(--color-text)' }}>Today's Tasks</h1>
       </div>
 
-      {/* Goals grid */}
-      {isLoading ? (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {[...Array(6)].map((_, i) => (
-            <div key={i} className="bg-[#1a1a1a] rounded-xl h-36 animate-pulse" />
-          ))}
-        </div>
-      ) : goals.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 text-center">
-          <span className="text-5xl mb-4">🎯</span>
-          <h3 className="text-white text-lg font-semibold mb-2">No goals yet</h3>
-          <p className="text-gray-500 text-sm mb-6">Add your first goal to get started</p>
-          <button
-            onClick={() => setShowModal(true)}
-            className="btn-primary px-6 py-3 rounded-xl"
-          >
-            Add Goal
-          </button>
-        </div>
-      ) : (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {goals.map((goal) => {
-            const color = goal.color || CATEGORY_COLORS[goal.category] || '#64748B'
-            return (
-              <div
-                key={goal.id}
-                className="bg-[#1a1a1a] rounded-xl p-4 border border-white/5 hover:border-purple-500/30 transition-all cursor-pointer relative overflow-hidden"
-                style={{ borderLeft: `3px solid ${color}` }}
-              >
-                {/* Progress bar background */}
-                <div
-                  className="absolute inset-0 opacity-5"
-                  style={{
-                    background: color,
-                    clipPath: `inset(0 ${100 - (goal.progress || 0)}% 0 0)`,
-                  }}
-                />
-
-                <div className="relative">
-                  <div
-                    className="inline-block text-xs font-medium px-2 py-0.5 rounded-full mb-3"
-                    style={{ background: `${color}22`, color }}
-                  >
-                    {goal.category}
-                  </div>
-                  <h3 className="text-white font-medium text-sm leading-snug mb-3 line-clamp-2">
-                    {goal.title}
-                  </h3>
-
-                  {/* Progress */}
-                  <div className="mb-2">
-                    <div className="flex justify-between text-xs text-gray-500 mb-1">
-                      <span>Progress</span>
-                      <span>{goal.progress || 0}%</span>
-                    </div>
-                    <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
-                      <div
-                        className="h-full rounded-full transition-all"
-                        style={{ width: `${goal.progress || 0}%`, background: color }}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Weight */}
-                  <div className="flex gap-0.5 mt-2">
-                    {[...Array(5)].map((_, i) => (
-                      <div
-                        key={i}
-                        className="w-2 h-2 rounded-sm"
-                        style={{ background: i < (goal.weight || 3) ? color : '#333' }}
-                      />
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )
-          })}
+      {/* Progress bar */}
+      {tasks.length > 0 && (
+        <div className="mb-6 p-4 rounded-xl border border-black/5 dark:border-white/5" style={{ backgroundColor: 'var(--color-surface)' }}>
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <Lightning size={16} weight="fill" className="text-purple-400" />
+              <span className="text-sm font-medium" style={{ color: 'var(--color-text)' }}>Daily Progress</span>
+            </div>
+            <span className="text-sm font-bold text-purple-400">{progress}%</span>
+          </div>
+          <div className="h-2 rounded-full overflow-hidden" style={{ backgroundColor: 'var(--color-surface-2)' }}>
+            <div
+              className="h-full bg-purple-500 rounded-full transition-all duration-500"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+          <p className="text-xs mt-2" style={{ color: 'var(--color-text-muted)' }}>
+            {completed.length} of {tasks.length} tasks completed
+          </p>
         </div>
       )}
 
-      {/* FAB */}
-      <button
-        onClick={() => setShowModal(true)}
-        className="fixed bottom-24 md:bottom-8 right-6 w-14 h-14 bg-purple-600 hover:bg-purple-700 rounded-full shadow-lg flex items-center justify-center text-white text-2xl transition-colors z-40"
-        title="Add goal"
-      >
-        +
-      </button>
-
-      {/* Add Goal Modal */}
-      {showModal && (
-        <div className="fixed inset-0 bg-black/60 flex items-end md:items-center justify-center z-50 p-4">
-          <div className="bg-[#1a1a1a] rounded-2xl p-6 w-full max-w-md border border-white/10">
-            <h3 className="text-white font-semibold text-lg mb-4">Add New Goal</h3>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm text-gray-400 mb-2">Goal Title</label>
-                <input
-                  type="text"
-                  value={newTitle}
-                  onChange={(e) => setNewTitle(e.target.value)}
-                  placeholder="What do you want to achieve?"
-                  className="input"
-                  autoFocus
-                />
-              </div>
-              <div>
-                <label className="block text-sm text-gray-400 mb-2">Category</label>
-                <select
-                  value={newCategory}
-                  onChange={(e) => setNewCategory(e.target.value)}
-                  className="input"
-                >
-                  {Object.keys(CATEGORY_COLORS).map((cat) => (
-                    <option key={cat} value={cat}>
-                      {cat.charAt(0).toUpperCase() + cat.slice(1)}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="flex gap-3 pt-2">
-                <button
-                  onClick={() => setShowModal(false)}
-                  className="flex-1 border border-white/10 text-gray-400 hover:text-white py-3 rounded-xl transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={() => createMutation.mutate()}
-                  disabled={!newTitle.trim() || createMutation.isPending}
-                  className="flex-1 btn-primary py-3 rounded-xl disabled:opacity-50"
-                >
-                  {createMutation.isPending ? 'Adding...' : 'Add Goal'}
-                </button>
-              </div>
-            </div>
+      {/* Loading */}
+      {isLoading ? (
+        <div className="space-y-3">
+          {[...Array(5)].map((_, i) => (
+            <div key={i} className="h-16 rounded-xl animate-pulse" style={{ backgroundColor: 'var(--color-surface)' }} />
+          ))}
+        </div>
+      ) : tasks.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-20 text-center">
+          <div className="w-20 h-20 rounded-2xl flex items-center justify-center mb-4 bg-purple-500/10">
+            <CalendarDots size={36} weight="duotone" className="text-purple-400" />
           </div>
+          <h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--color-text)' }}>No tasks for today</h3>
+          <p className="text-sm mb-6 max-w-xs" style={{ color: 'var(--color-text-muted)' }}>
+            Complete onboarding to get a personalized daily plan, or add goals first.
+          </p>
+        </div>
+      ) : (
+        <div className="space-y-2">
+          {/* Pending tasks */}
+          {pending.map((task) => {
+            const color = task.goal?.color || STATUS_COLORS[task.goal?.category || 'other']
+            return (
+              <div
+                key={task.id}
+                className="flex items-start gap-3 p-4 rounded-xl border border-black/5 dark:border-white/5 transition-all group"
+                style={{ backgroundColor: 'var(--color-surface)' }}
+              >
+                <button
+                  onClick={() => completeMutation.mutate(task.id)}
+                  className="mt-0.5 flex-shrink-0 text-gray-400 hover:text-purple-400 transition-colors"
+                  disabled={completeMutation.isPending}
+                >
+                  <Square size={22} weight="regular" />
+                </button>
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium text-sm" style={{ color: 'var(--color-text)' }}>{task.title}</p>
+                  {task.description && (
+                    <p className="text-xs mt-0.5 truncate" style={{ color: 'var(--color-text-muted)' }}>{task.description}</p>
+                  )}
+                  {task.goal && (
+                    <span
+                      className="inline-block text-xs px-2 py-0.5 rounded-full mt-1.5"
+                      style={{ background: `${color}22`, color }}
+                    >
+                      {task.goal.title}
+                    </span>
+                  )}
+                </div>
+                {task.estimatedMinutes && (
+                  <span className="text-xs flex-shrink-0" style={{ color: 'var(--color-text-muted)' }}>
+                    {task.estimatedMinutes}m
+                  </span>
+                )}
+                <button
+                  onClick={() => skipMutation.mutate(task.id)}
+                  className="opacity-0 group-hover:opacity-100 text-xs transition-opacity"
+                  style={{ color: 'var(--color-text-muted)' }}
+                >
+                  Skip
+                </button>
+              </div>
+            )
+          })}
+
+          {/* Completed tasks */}
+          {completed.length > 0 && (
+            <div className="mt-4">
+              <p className="text-xs font-medium mb-2 px-1" style={{ color: 'var(--color-text-muted)' }}>
+                COMPLETED ({completed.length})
+              </p>
+              {completed.map((task) => (
+                <div
+                  key={task.id}
+                  className="flex items-center gap-3 p-4 rounded-xl mb-2 opacity-60"
+                  style={{ backgroundColor: 'var(--color-surface)' }}
+                >
+                  <CheckSquare size={22} weight="fill" className="text-green-400 flex-shrink-0" />
+                  <p className="text-sm line-through flex-1" style={{ color: 'var(--color-text-secondary)' }}>
+                    {task.title}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>
