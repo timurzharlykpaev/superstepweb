@@ -49,15 +49,15 @@ export const changeLanguage = (lang: LanguageCode | 'system') => {
 }
 
 export const SUPPORTED_LANGUAGES = [
-  { code: 'en' as const, name: 'English', nativeName: 'English' },
-  { code: 'ru' as const, name: 'Russian', nativeName: 'Русский' },
-  { code: 'es' as const, name: 'Spanish', nativeName: 'Español' },
-  { code: 'de' as const, name: 'German', nativeName: 'Deutsch' },
-  { code: 'fr' as const, name: 'French', nativeName: 'Français' },
-  { code: 'pt' as const, name: 'Portuguese', nativeName: 'Português' },
-  { code: 'zh' as const, name: 'Chinese', nativeName: '中文' },
-  { code: 'ja' as const, name: 'Japanese', nativeName: '日本語' },
-  { code: 'ko' as const, name: 'Korean', nativeName: '한국어' },
-] as const
+  { code: 'en' as const, name: 'English', nativeName: 'English', flag: '🇺🇸' },
+  { code: 'ru' as const, name: 'Russian', nativeName: 'Русский', flag: '🇷🇺' },
+  { code: 'es' as const, name: 'Spanish', nativeName: 'Español', flag: '🇪🇸' },
+  { code: 'de' as const, name: 'German', nativeName: 'Deutsch', flag: '🇩🇪' },
+  { code: 'fr' as const, name: 'French', nativeName: 'Français', flag: '🇫🇷' },
+  { code: 'pt' as const, name: 'Portuguese', nativeName: 'Português', flag: '🇧🇷' },
+  { code: 'zh' as const, name: 'Chinese', nativeName: '中文', flag: '🇨🇳' },
+  { code: 'ja' as const, name: 'Japanese', nativeName: '日本語', flag: '🇯🇵' },
+  { code: 'ko' as const, name: 'Korean', nativeName: '한국어', flag: '🇰🇷' },
+]
 
 export default i18n

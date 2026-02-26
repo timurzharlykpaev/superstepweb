@@ -3,11 +3,17 @@ import { useNavigate } from 'react-router-dom'
 import { GoogleLogin } from '@react-oauth/google'
 import { sendOtp, verifyOtp, googleSignIn } from '../../api/auth'
 import { useAuthStore } from '../../store/authStore'
+import { useOnboardingStore } from '../../store/onboardingStore'
 import ThemeToggle from '../../components/ThemeToggle'
 
 export default function LoginPage() {
   const navigate = useNavigate()
   const login = useAuthStore((s) => s.login)
+  const isOnboardingCompleted = useOnboardingStore((s) => s.isCompleted)
+
+  const redirectAfterLogin = () => {
+    navigate(isOnboardingCompleted ? '/app/today' : '/onboarding')
+  }
 
   const [step, setStep] = useState<'email' | 'otp'>('email')
   const [email, setEmail] = useState('')
@@ -38,7 +44,7 @@ export default function LoginPage() {
       const res = await verifyOtp(email, code)
       const { accessToken, refreshToken, user } = res.data
       login({ accessToken, refreshToken }, user)
-      navigate('/app/today')
+      redirectAfterLogin()
     } catch {
       setError('Invalid code. Please try again.')
     } finally {
@@ -53,7 +59,7 @@ export default function LoginPage() {
       const res = await googleSignIn(idToken)
       const { accessToken, refreshToken, user } = res.data
       login({ accessToken, refreshToken }, user)
-      navigate('/app/today')
+      redirectAfterLogin()
     } catch {
       setError('Google sign-in failed. Please try again.')
     } finally {
