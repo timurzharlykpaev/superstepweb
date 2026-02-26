@@ -24,7 +24,7 @@ jobs:
       - name: Build
         run: npm run build
         env:
-          VITE_API_URL: https://api.steptogoal.io/api/v1
+          VITE_API_URL: https://api.steptogoal.io
 
       - name: Deploy to server
         uses: appleboy/scp-action@v0.1.7
