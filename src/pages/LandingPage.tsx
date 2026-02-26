@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { useState } from 'react'
 import {
   CalendarDots, CheckSquare, ChartBar, Robot,
   Star, Crosshair, Microphone, Globe,
@@ -6,6 +7,69 @@ import {
 } from '@phosphor-icons/react'
 import ThemeToggle from '../components/ThemeToggle'
 import { LS_STORE_URL, LS_VARIANT_MONTHLY, LS_VARIANT_YEARLY } from '../constants/config'
+
+const IOS_URL = 'https://apps.apple.com/app/steptogoal/id6741838195'
+const ANDROID_URL = 'https://play.google.com/store/apps/details?id=io.steptogoal.mobile'
+
+function usePlatform() {
+  const ua = typeof navigator !== 'undefined' ? navigator.userAgent : ''
+  const isIOS = /iPad|iPhone|iPod/.test(ua) && !(window as any).MSStream
+  const isMobile = isIOS || /android/i.test(ua)
+  return { isIOS, isMobile }
+}
+
+function MobileAppBanner() {
+  const { isIOS, isMobile } = usePlatform()
+  const [dismissed, setDismissed] = useState(() => !!sessionStorage.getItem('bannerDismissed'))
+
+  if (!isMobile || dismissed) return null
+
+  const storeUrl = isIOS ? IOS_URL : ANDROID_URL
+  const storeLabel = isIOS ? '⬇ App Store' : '⬇ Google Play'
+
+  return (
+    <div className="fixed bottom-0 left-0 right-0 z-50 flex items-center gap-3 px-4 py-3 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 shadow-2xl">
+      <img src="/icon.png" alt="StepToGoal" className="w-12 h-12 rounded-xl flex-shrink-0" />
+      <div className="flex-1 min-w-0">
+        <div className="font-bold text-sm text-gray-900 dark:text-white">StepToGoal</div>
+        <div className="text-xs text-gray-500">Achieve your goals step by step</div>
+      </div>
+      <a
+        href={storeUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex-shrink-0 bg-purple-600 hover:bg-purple-700 text-white text-sm font-semibold px-4 py-2 rounded-lg"
+      >
+        {storeLabel}
+      </a>
+      <button
+        onClick={() => { setDismissed(true); sessionStorage.setItem('bannerDismissed', '1') }}
+        className="flex-shrink-0 text-gray-400 hover:text-gray-600 text-xl leading-none px-1"
+      >
+        ×
+      </button>
+    </div>
+  )
+}
+
+function StoreButtons({ className = '' }: { className?: string }) {
+  const { isMobile } = usePlatform()
+  if (isMobile) return null // on mobile we only show the web app CTA + banner
+  return (
+    <div className={`flex gap-3 ${className}`}>
+      <a href={IOS_URL} target="_blank" rel="noopener noreferrer"
+        className="inline-flex items-center gap-2 border border-white/20 hover:border-white/40 text-gray-300 hover:text-white font-semibold px-5 py-3 rounded-xl text-sm transition-colors">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+        App Store
+      </a>
+      <a href={ANDROID_URL} target="_blank" rel="noopener noreferrer"
+        className="inline-flex items-center gap-2 border border-white/20 hover:border-white/40 text-gray-300 hover:text-white font-semibold px-5 py-3 rounded-xl text-sm transition-colors">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M17.523 15.341 20 10.5l-2.477-4.841A1 1 0 0 0 16.6 5H7.4a1 1 0 0 0-.923.659L4 10.5l2.477 4.841A1 1 0 0 0 7.4 16h9.2a1 1 0 0 0 .923-.659zM8.5 8a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3zm7 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3z"/></svg>
+        Google Play
+      </a>
+    </div>
+  )
+}
 
 const features = [
   {
@@ -86,6 +150,7 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen overflow-x-hidden" style={{ backgroundColor: 'var(--color-background)', color: 'var(--color-text)' }}>
+      <MobileAppBanner />
       {/* Background glows */}
       <div className="fixed top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-purple-600/10 rounded-full blur-3xl pointer-events-none" />
       <div className="fixed top-1/3 right-0 w-64 h-64 bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
@@ -149,6 +214,7 @@ export default function LandingPage() {
               <ArrowRight size={18} />
             </a>
           </div>
+          <StoreButtons className="justify-center mt-4" />
 
           {/* Stats */}
           <div className="flex items-center justify-center gap-8 mt-16 text-center">
