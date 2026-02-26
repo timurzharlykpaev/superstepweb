@@ -3,7 +3,7 @@ import { useState } from 'react'
 import {
   CalendarDots, CheckSquare, ChartBar, Robot,
   Star, Crosshair, Microphone, Globe,
-  Lightning, ArrowRight,
+  Lightning,
 } from '@phosphor-icons/react'
 import ThemeToggle from '../components/ThemeToggle'
 import { LS_STORE_URL, LS_VARIANT_MONTHLY, LS_VARIANT_YEARLY } from '../constants/config'
