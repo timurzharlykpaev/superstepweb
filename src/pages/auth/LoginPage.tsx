@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { sendOtp, verifyOtp } from '../../api/auth'
+import { GoogleLogin } from '@react-oauth/google'
+import { sendOtp, verifyOtp, googleSignIn } from '../../api/auth'
 import { useAuthStore } from '../../store/authStore'
 
 export default function LoginPage() {
@@ -11,6 +12,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [code, setCode] = useState('')
   const [loading, setLoading] = useState(false)
+  const [, setGoogleLoading] = useState(false)
   const [error, setError] = useState('')
 
   const handleSendOtp = async (e: React.FormEvent) => {
@@ -43,6 +45,23 @@ export default function LoginPage() {
     }
   }
 
+  const handleGoogleSuccess = async (idToken: string) => {
+    setError('')
+    setGoogleLoading(true)
+    try {
+      const res = await googleSignIn(idToken)
+      const { accessToken, refreshToken, user } = res.data
+      login({ accessToken, refreshToken }, user)
+      navigate('/app/today')
+    } catch {
+      setError('Google sign-in failed. Please try again.')
+    } finally {
+      setGoogleLoading(false)
+    }
+  }
+
+
+
   return (
     <div className="min-h-screen bg-[#0D0D0D] flex items-center justify-center px-4">
       {/* Background glow */}
@@ -51,8 +70,8 @@ export default function LoginPage() {
       <div className="relative w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-purple-600/20 rounded-2xl mb-4">
-            <span className="text-3xl">🎯</span>
+          <div className="inline-flex items-center justify-center w-16 h-16 mb-4">
+            <img src="/logo.png" alt="StepToGoal" className="w-16 h-16 rounded-2xl" />
           </div>
           <h1 className="text-2xl font-bold text-white">StepToGoal</h1>
           <p className="text-gray-400 mt-1">Your goals deserve a plan</p>
@@ -63,7 +82,31 @@ export default function LoginPage() {
           {step === 'email' ? (
             <>
               <h2 className="text-xl font-semibold text-white mb-2">Welcome back</h2>
-              <p className="text-gray-400 text-sm mb-6">Enter your email to receive a sign-in code</p>
+              <p className="text-gray-400 text-sm mb-6">Sign in to continue your journey</p>
+
+              {/* Google Sign-In */}
+              <div className="mb-4">
+                <GoogleLogin
+                  onSuccess={(credentialResponse) => {
+                    if (credentialResponse.credential) {
+                      handleGoogleSuccess(credentialResponse.credential)
+                    }
+                  }}
+                  onError={() => setError('Google sign-in was cancelled or failed.')}
+                  width="100%"
+                  theme="outline"
+                  size="large"
+                  text="continue_with"
+                  shape="rectangular"
+                />
+              </div>
+
+              {/* Divider */}
+              <div className="flex items-center gap-3 mb-4">
+                <div className="flex-1 h-px bg-white/10" />
+                <span className="text-gray-500 text-xs">or continue with email</span>
+                <div className="flex-1 h-px bg-white/10" />
+              </div>
 
               <form onSubmit={handleSendOtp} className="space-y-4">
                 <div>

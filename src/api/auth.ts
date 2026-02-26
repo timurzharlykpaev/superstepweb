@@ -10,5 +10,12 @@ export const verifyOtp = (email: string, code: string) =>
     user: { id: string; email: string; nickname?: string; avatarUrl?: string }
   }>('/auth/email/verify', { email, code })
 
+export const googleSignIn = (idToken: string) =>
+  client.post<{
+    accessToken: string
+    refreshToken: string
+    user: { id: string; email: string; nickname?: string; avatarUrl?: string }
+  }>('/auth/google', { idToken })
+
 export const getProfile = () =>
   client.get<{ userId: string; subscription: unknown }>('/auth/profile')
