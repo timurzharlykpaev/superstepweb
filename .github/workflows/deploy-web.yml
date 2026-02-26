@@ -12,8 +12,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DO_API_TOKEN }}
+
       - name: Login to DigitalOcean Registry
-        run: echo "${{ secrets.DO_REGISTRY_TOKEN }}" | docker login registry.digitalocean.com -u do-registry --password-stdin
+        run: doctl registry login --expiry-seconds 1200
 
       - name: Build Docker image
         run: docker build -t registry.digitalocean.com/steptogoal/web:latest .
@@ -24,11 +29,12 @@ jobs:
       - name: Deploy to server
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: ${{ secrets.SSH_HOST }}
-          username: root
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
-            echo "${{ secrets.DO_REGISTRY_TOKEN }}" | docker login registry.digitalocean.com -u do-registry --password-stdin
+            doctl registry login --expiry-seconds 1200 2>/dev/null || \
+              docker login registry.digitalocean.com -u do-registry --password-stdin <<< "${{ secrets.DO_API_TOKEN }}"
             docker pull registry.digitalocean.com/steptogoal/web:latest
             docker stop steptogoal-web || true
             docker rm steptogoal-web || true
@@ -37,3 +43,4 @@ jobs:
               --restart always \
               -p 3000:80 \
               registry.digitalocean.com/steptogoal/web:latest
+            echo "✅ Web app deployed"
