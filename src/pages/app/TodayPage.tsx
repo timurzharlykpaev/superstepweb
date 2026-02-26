@@ -40,12 +40,12 @@ export default function TodayPage() {
   })
 
   const completeMutation = useMutation({
-    mutationFn: (id: string) => client.patch(`/tasks/${id}/complete`),
+    mutationFn: (id: string) => client.post(`/tasks/${id}/complete`),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['tasks-today'] }),
   })
 
   const skipMutation = useMutation({
-    mutationFn: (id: string) => client.patch(`/tasks/${id}/skip`),
+    mutationFn: (id: string) => client.post(`/tasks/${id}/skip`),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['tasks-today'] }),
   })
 

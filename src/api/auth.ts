@@ -18,4 +18,4 @@ export const googleSignIn = (idToken: string) =>
   }>('/auth/google', { idToken })
 
 export const getProfile = () =>
-  client.get<{ userId: string; subscription: unknown }>('/auth/profile')
+  client.get<{ id: string; email: string; nickname?: string; avatarUrl?: string }>('/auth/me')
