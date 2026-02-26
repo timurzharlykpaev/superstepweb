@@ -11,6 +11,7 @@ import SettingsPage from './pages/app/SettingsPage'
 import LanguagePage from './pages/onboarding/LanguagePage'
 import ShowcasePage from './pages/onboarding/ShowcasePage'
 import GoalInputPage from './pages/onboarding/GoalInputPage'
+import ClarifyPage from './pages/onboarding/ClarifyPage'
 import ProcessingPage from './pages/onboarding/ProcessingPage'
 import ResultPage from './pages/onboarding/ResultPage'
 import SubscriptionPage from './pages/onboarding/SubscriptionPage'
@@ -27,6 +28,7 @@ export default function App() {
         <Route path="language" element={<LanguagePage />} />
         <Route path="showcase" element={<ShowcasePage />} />
         <Route path="goal" element={<GoalInputPage />} />
+        <Route path="clarify" element={<ClarifyPage />} />
         <Route path="processing" element={<ProcessingPage />} />
         <Route path="result" element={<ResultPage />} />
         <Route path="subscription" element={<SubscriptionPage />} />

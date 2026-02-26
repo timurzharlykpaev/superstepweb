@@ -1,6 +1,7 @@
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Microphone, Stop, TextT, ArrowRight, ArrowLeft } from '@phosphor-icons/react'
+import { useVoiceOnboardingStore } from '../../store/voiceOnboardingStore'
 
 type Mode = 'voice' | 'text'
 type RecordState = 'idle' | 'recording' | 'processing'
@@ -20,8 +21,20 @@ export default function GoalInputPage() {
 
   const mediaRef = useRef<MediaRecorder | null>(null)
   const chunksRef = useRef<Blob[]>([])
+  const recordingStartTime = useRef<number>(0)
+
+  const { setPendingAudio, setTextInput: storeSetTextInput } = useVoiceOnboardingStore()
 
   const language = navigator.language?.split('-')[0] || 'en'
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (mediaRef.current && mediaRef.current.state !== 'inactive') {
+        mediaRef.current.stop()
+      }
+    }
+  }, [])
 
   const startRecording = useCallback(async () => {
     setError('')
@@ -29,18 +42,21 @@ export default function GoalInputPage() {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
       const mr = new MediaRecorder(stream, { mimeType: 'audio/webm' })
       chunksRef.current = []
-      mr.ondataavailable = (e) => { if (e.data.size > 0) chunksRef.current.push(e.data) }
+      recordingStartTime.current = Date.now()
+
+      mr.ondataavailable = (e) => {
+        if (e.data.size > 0) chunksRef.current.push(e.data)
+      }
+
       mr.onstop = async () => {
         stream.getTracks().forEach(t => t.stop())
         setRecordState('processing')
         try {
           const blob = new Blob(chunksRef.current, { type: 'audio/webm' })
-          // Convert to base64 and store — processing page will call API
           const reader = new FileReader()
           reader.onloadend = () => {
             const base64 = (reader.result as string).split(',')[1]
-            sessionStorage.setItem('onboarding-audio', base64)
-            sessionStorage.setItem('onboarding-audio-lang', language)
+            setPendingAudio(base64, language)
             navigate('/onboarding/processing')
           }
           reader.readAsDataURL(blob)
@@ -49,13 +65,14 @@ export default function GoalInputPage() {
           setRecordState('idle')
         }
       }
+
       mr.start()
       mediaRef.current = mr
       setRecordState('recording')
     } catch {
       setError('Microphone access denied. Please use text input.')
     }
-  }, [language, navigate])
+  }, [language, navigate, setPendingAudio])
 
   const stopRecording = useCallback(() => {
     mediaRef.current?.stop()
@@ -64,10 +81,9 @@ export default function GoalInputPage() {
 
   const handleTextSubmit = useCallback(() => {
     if (!textInput.trim()) return
-    sessionStorage.setItem('onboarding-goal', textInput.trim())
-    sessionStorage.removeItem('onboarding-audio')
+    storeSetTextInput(textInput.trim())
     navigate('/onboarding/processing')
-  }, [textInput, navigate])
+  }, [textInput, storeSetTextInput, navigate])
 
   // ── Text mode ──────────────────────────────────────────────────────────────
   if (mode === 'text') {
@@ -101,6 +117,13 @@ export default function GoalInputPage() {
         </div>
 
         <div className="flex-shrink-0 px-6 pb-8 pt-4">
+          {/* Dots */}
+          <div className="flex justify-center gap-2 mb-4">
+            {[0,1,2,3,4,5].map(i => (
+              <div key={i} className={`rounded-full ${i === 2 ? 'w-6 h-2 bg-purple-500' : 'w-2 h-2 bg-gray-600'}`} />
+            ))}
+          </div>
+
           <button
             onClick={handleTextSubmit}
             disabled={!textInput.trim()}
