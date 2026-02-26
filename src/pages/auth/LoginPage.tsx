@@ -1,0 +1,137 @@
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { sendOtp, verifyOtp } from '../../api/auth'
+import { useAuthStore } from '../../store/authStore'
+
+export default function LoginPage() {
+  const navigate = useNavigate()
+  const login = useAuthStore((s) => s.login)
+
+  const [step, setStep] = useState<'email' | 'otp'>('email')
+  const [email, setEmail] = useState('')
+  const [code, setCode] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+
+  const handleSendOtp = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError('')
+    setLoading(true)
+    try {
+      await sendOtp(email)
+      setStep('otp')
+    } catch {
+      setError('Failed to send code. Please check your email and try again.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleVerify = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError('')
+    setLoading(true)
+    try {
+      const res = await verifyOtp(email, code)
+      const { accessToken, refreshToken, user } = res.data
+      login({ accessToken, refreshToken }, user)
+      navigate('/app/today')
+    } catch {
+      setError('Invalid code. Please try again.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div className="min-h-screen bg-[#0D0D0D] flex items-center justify-center px-4">
+      {/* Background glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl pointer-events-none" />
+
+      <div className="relative w-full max-w-md">
+        {/* Logo */}
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-purple-600/20 rounded-2xl mb-4">
+            <span className="text-3xl">🎯</span>
+          </div>
+          <h1 className="text-2xl font-bold text-white">StepToGoal</h1>
+          <p className="text-gray-400 mt-1">Your goals deserve a plan</p>
+        </div>
+
+        {/* Card */}
+        <div className="bg-[#1a1a1a] rounded-2xl border border-white/5 p-8">
+          {step === 'email' ? (
+            <>
+              <h2 className="text-xl font-semibold text-white mb-2">Welcome back</h2>
+              <p className="text-gray-400 text-sm mb-6">Enter your email to receive a sign-in code</p>
+
+              <form onSubmit={handleSendOtp} className="space-y-4">
+                <div>
+                  <label className="block text-sm text-gray-400 mb-2">Email</label>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="your@email.com"
+                    required
+                    className="input"
+                  />
+                </div>
+
+                {error && <p className="text-red-400 text-sm">{error}</p>}
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="btn-primary w-full py-3 rounded-xl disabled:opacity-50"
+                >
+                  {loading ? 'Sending...' : 'Send Code'}
+                </button>
+              </form>
+            </>
+          ) : (
+            <>
+              <h2 className="text-xl font-semibold text-white mb-2">Check your email</h2>
+              <p className="text-gray-400 text-sm mb-6">
+                We sent a 6-digit code to <span className="text-purple-400">{email}</span>
+              </p>
+
+              <form onSubmit={handleVerify} className="space-y-4">
+                <div>
+                  <label className="block text-sm text-gray-400 mb-2">Verification Code</label>
+                  <input
+                    type="text"
+                    value={code}
+                    onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                    placeholder="123456"
+                    maxLength={6}
+                    required
+                    className="input text-center text-2xl tracking-widest"
+                  />
+                </div>
+
+                {error && <p className="text-red-400 text-sm">{error}</p>}
+
+                <button
+                  type="submit"
+                  disabled={loading || code.length !== 6}
+                  className="btn-primary w-full py-3 rounded-xl disabled:opacity-50"
+                >
+                  {loading ? 'Verifying...' : 'Verify & Sign In'}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => { setStep('email'); setCode(''); setError('') }}
+                  className="text-gray-400 hover:text-white text-sm w-full text-center transition-colors"
+                >
+                  ← Back to email
+                </button>
+              </form>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}

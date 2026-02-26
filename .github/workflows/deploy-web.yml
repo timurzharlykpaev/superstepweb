@@ -1,0 +1,39 @@
+name: Deploy Web App
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Login to DigitalOcean Registry
+        run: echo "${{ secrets.DO_REGISTRY_TOKEN }}" | docker login registry.digitalocean.com -u do-registry --password-stdin
+
+      - name: Build Docker image
+        run: docker build -t registry.digitalocean.com/steptogoal/web:latest .
+
+      - name: Push Docker image
+        run: docker push registry.digitalocean.com/steptogoal/web:latest
+
+      - name: Deploy to server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            echo "${{ secrets.DO_REGISTRY_TOKEN }}" | docker login registry.digitalocean.com -u do-registry --password-stdin
+            docker pull registry.digitalocean.com/steptogoal/web:latest
+            docker stop steptogoal-web || true
+            docker rm steptogoal-web || true
+            docker run -d \
+              --name steptogoal-web \
+              --restart always \
+              -p 3000:80 \
+              registry.digitalocean.com/steptogoal/web:latest
