@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { voiceApi } from '../api/voice'
+import api from '../api/client'
 import type {
   VoiceCreateGoalResponse,
   VoiceCreateFinalResponse,
@@ -372,6 +373,13 @@ export const useVoiceOnboardingStore = create<VoiceOnboardingState>((set, get) =
         goal: finalGoal,
         subGoals,
       })
+
+      // Mark onboarding complete on backend
+      try {
+        await api.post('/onboarding/complete', { language: 'en' })
+      } catch {
+        // non-fatal — proceed even if this fails
+      }
 
       set({
         status: 'completed',
