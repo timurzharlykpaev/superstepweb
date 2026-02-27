@@ -13,18 +13,22 @@ export default function ProtectedRoute({ children, requireOnboarding }: Props) {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated)
   const isCompleted = useOnboardingStore((s) => s.isCompleted)
   const setCompleted = useOnboardingStore((s) => s.setCompleted)
-  const [checking, setChecking] = useState(requireOnboarding && !isCompleted)
+  // Only check backend once on first mount if not yet completed
+  const [serverChecked, setServerChecked] = useState(false)
 
   useEffect(() => {
-    if (!requireOnboarding || isCompleted) return
-    // Sync with backend — in case localStorage is stale
-    api.get('/onboarding/status').then((res) => {
-      if (res.data?.completed) setCompleted(true)
-    }).catch(() => {}).finally(() => setChecking(false))
-  }, [requireOnboarding, isCompleted, setCompleted])
+    if (!requireOnboarding || isCompleted || serverChecked) return
+    api.get('/onboarding/status')
+      .then((res) => { if (res.data?.completed) setCompleted(true) })
+      .catch(() => {})
+      .finally(() => setServerChecked(true))
+  }, [requireOnboarding, isCompleted, serverChecked, setCompleted])
 
   if (!isAuthenticated) return <Navigate to="/login" replace />
-  if (checking) return null // brief flash while checking
+
+  // If needs onboarding check: wait for server response only if not already completed
+  if (requireOnboarding && !isCompleted && !serverChecked) return null
+
   if (requireOnboarding && !isCompleted) return <Navigate to="/onboarding" replace />
 
   return children ? <>{children}</> : <Outlet />
