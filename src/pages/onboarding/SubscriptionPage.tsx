@@ -2,7 +2,9 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Crown, Check, Sparkle, Lightning } from '@phosphor-icons/react'
 import { useOnboardingStore } from '../../store/onboardingStore'
+import { useAuthStore } from '../../store/authStore'
 import api from '../../api/client'
+import { LS_STORE_URL, LS_VARIANT_MONTHLY, LS_VARIANT_YEARLY } from '../../constants/config'
 
 const BENEFITS = [
   { icon: <Lightning size={18} weight="fill" />, text: 'Unlimited goals & sub-goals' },
@@ -16,37 +18,31 @@ const BENEFITS = [
 export default function SubscriptionPage() {
   const navigate = useNavigate()
   const setCompleted = useOnboardingStore((s) => s.setCompleted)
+  const user = useAuthStore((s) => s.user)
   const [selected, setSelected] = useState<'yearly' | 'monthly'>('yearly')
   const [loading, setLoading] = useState(false)
 
   const completeOnboarding = async () => {
     setCompleted(true)
-    // also mark on backend (best-effort)
     try { await api.post('/onboarding/complete', { language: 'en' }) } catch { /* ignore */ }
   }
 
   const handleSubscribe = async () => {
     setLoading(true)
-    try {
-      const res = await api.post('/subscriptions/lemonsqueezy/checkout', {
-        plan: selected,
-        returnUrl: window.location.origin + '/app/today',
-      })
-      const url = res.data?.checkoutUrl || res.data?.url
-      if (url) {
-        await completeOnboarding()
-        window.location.href = url
-      } else {
-        await completeOnboarding()
-        navigate('/app/today')
-      }
-    } catch {
-      // Checkout failed — still complete onboarding and go to app
-      await completeOnboarding()
-      navigate('/app/today')
-    } finally {
-      setLoading(false)
+    await completeOnboarding()
+
+    const variantId = selected === 'yearly' ? LS_VARIANT_YEARLY : LS_VARIANT_MONTHLY
+    const checkoutUrl = new URL(`${LS_STORE_URL}/checkout/buy/${variantId}`)
+
+    // Pre-fill email if available
+    if (user?.email) {
+      checkoutUrl.searchParams.set('checkout[email]', user.email)
     }
+    // Return URL after payment
+    checkoutUrl.searchParams.set('checkout[custom][user_id]', user?.id?.toString() || '')
+    checkoutUrl.searchParams.set('redirect_url', window.location.origin + '/app/today')
+
+    window.location.href = checkoutUrl.toString()
   }
 
   const handleSkip = async () => {
