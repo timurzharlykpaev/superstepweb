@@ -2,7 +2,9 @@ import { useState } from 'react'
 import { useQuery, useMutation } from '@tanstack/react-query'
 import {
   Crown, Globe, Lock, SignOut,
-  PencilSimple, Check, X, ArrowRight
+  PencilSimple, Check, X, ArrowRight,
+  Bell, SlidersHorizontal, ChartLine, ClockCounterClockwise,
+  Clock, Info, Code, Trash
 } from '@phosphor-icons/react'
 import { useAuthStore } from '../../store/authStore'
 import { useThemeStore } from '../../store/themeStore'
@@ -25,6 +27,9 @@ export default function SettingsPage() {
   const [showLangPicker, setShowLangPicker] = useState(false)
   const [showEmojiPicker, setShowEmojiPicker] = useState(false)
   const [currentLang, setCurrentLang] = useState(() => localStorage.getItem('language') || 'en')
+  const [timeFormat, setTimeFormat] = useState<'12h' | '24h'>(() =>
+    (localStorage.getItem('timeFormat') as '12h' | '24h') || '12h'
+  )
 
   const { data: sub } = useQuery({
     queryKey: ['subscription'],
@@ -60,8 +65,40 @@ export default function SettingsPage() {
     setShowLangPicker(false)
   }
 
+  const handleTimeFormatToggle = () => {
+    const newFormat = timeFormat === '12h' ? '24h' : '12h'
+    setTimeFormat(newFormat)
+    localStorage.setItem('timeFormat', newFormat)
+  }
+
   const handleLogout = () => {
     if (confirm('Sign out?')) logout()
+  }
+
+  const handleResetOnboarding = async () => {
+    if (confirm('Reset onboarding? This will clear your onboarding progress.')) {
+      try {
+        await client.post('/auth/reset-onboarding')
+        alert('Onboarding reset successfully. Please log in again.')
+        logout()
+      } catch (error) {
+        alert('Failed to reset onboarding')
+      }
+    }
+  }
+
+  const handleClearAllData = async () => {
+    if (confirm('⚠️ Clear ALL data? This will delete all your goals, wishes, and progress. This action cannot be undone!')) {
+      if (confirm('Are you absolutely sure? This is permanent!')) {
+        try {
+          await client.post('/auth/clear-all-data')
+          alert('All data cleared successfully. Please log in again.')
+          logout()
+        } catch (error) {
+          alert('Failed to clear data')
+        }
+      }
+    }
   }
 
   const avatarEmoji = user?.avatarUrl?.startsWith('emoji:') ? user.avatarUrl.slice(6) : null
@@ -174,18 +211,47 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      {/* Language */}
+      {/* Preferences */}
       <div className="space-y-1">
         <p className="text-xs font-semibold px-1 mb-2" style={{ color: 'var(--color-text-muted)' }}>PREFERENCES</p>
         {settingRow(<Globe size={18} />, 'Language', langName, () => setShowLangPicker(true))}
+        <div className="rounded-xl p-4 flex items-center justify-between" style={{ backgroundColor: 'var(--color-surface)' }}>
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-purple-500/10 flex items-center justify-center">
+              <Clock size={18} className="text-purple-400" />
+            </div>
+            <p className="text-sm font-medium" style={{ color: 'var(--color-text)' }}>Time Format</p>
+          </div>
+          <button
+            onClick={handleTimeFormatToggle}
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors hover:bg-white/5"
+            style={{ color: 'var(--color-text-secondary)' }}
+          >
+            {timeFormat === '12h' ? '12-hour' : '24-hour'}
+          </button>
+        </div>
+        {settingRow(<Bell size={18} />, 'Notifications', undefined, () => alert('Notifications page coming soon'))}
+        {settingRow(<SlidersHorizontal size={18} />, 'Preferences', undefined, () => alert('Preferences page coming soon'))}
+        {settingRow(<ChartLine size={18} />, 'Insights', undefined, () => alert('Insights page coming soon'))}
+        {settingRow(<ClockCounterClockwise size={18} />, 'History', undefined, () => alert('History page coming soon'))}
       </div>
 
       {/* Account */}
       <div className="space-y-1">
         <p className="text-xs font-semibold px-1 mb-2" style={{ color: 'var(--color-text-muted)' }}>ACCOUNT</p>
         {settingRow(<Lock size={18} />, 'Privacy Policy', undefined, () => window.open('/privacy'))}
+        {settingRow(<Info size={18} />, 'About', 'Version 1.0.0', () => alert('StepToGoal v1.0.0'))}
         {settingRow(<SignOut size={18} />, 'Sign Out', undefined, handleLogout, true)}
       </div>
+
+      {/* Dev Tools */}
+      {import.meta.env.DEV && (
+        <div className="space-y-1">
+          <p className="text-xs font-semibold px-1 mb-2" style={{ color: 'var(--color-text-muted)' }}>DEV TOOLS</p>
+          {settingRow(<Code size={18} />, 'Reset Onboarding', undefined, handleResetOnboarding)}
+          {settingRow(<Trash size={18} />, 'Clear All Data', undefined, handleClearAllData, true)}
+        </div>
+      )}
 
       {/* Emoji picker modal */}
       {showEmojiPicker && (
