@@ -1,22 +1,22 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Crosshair, CalendarDots, Lightning, ArrowRight } from '@phosphor-icons/react'
+import { ArrowRight } from '@phosphor-icons/react'
 
 const SLIDES = [
   {
-    icon: <Crosshair size={56} weight="duotone" className="text-violet-400" />,
+    image: '/onboarding-showcase-goals.png',
     bg: 'from-violet-600/20 to-purple-600/10',
     title: 'Set Your Goal',
     subtitle: 'Tell us your dream in your own words. AI creates a smart, actionable plan tailored just for you.',
   },
   {
-    icon: <CalendarDots size={56} weight="duotone" className="text-blue-400" />,
+    image: '/onboarding-showcase-track.png',
     bg: 'from-blue-600/20 to-cyan-600/10',
     title: 'Weekly Planning',
     subtitle: 'Break your goal into weekly milestones and daily tasks that fit perfectly into your schedule.',
   },
   {
-    icon: <Lightning size={56} weight="duotone" className="text-amber-400" />,
+    image: '/onboarding-showcase-ai.png',
     bg: 'from-amber-600/20 to-orange-600/10',
     title: 'Track & Achieve',
     subtitle: 'Complete daily tasks, track your streak, and celebrate every step forward on your journey.',
@@ -48,10 +48,12 @@ export default function ShowcasePage() {
 
       {/* Slide — занимает всё оставшееся место */}
       <div className="flex-1 flex flex-col items-center justify-center px-6 min-h-0">
-        <div className="w-full max-w-md text-center">
-          <div className={`bg-gradient-to-b ${current.bg} w-28 h-28 rounded-3xl flex items-center justify-center mx-auto mb-6`}>
-            {current.icon}
-          </div>
+        <div className="w-full max-w-sm text-center">
+          <img
+            src={current.image}
+            alt={current.title}
+            className="w-56 h-44 object-contain mx-auto mb-6 drop-shadow-2xl"
+          />
           <h1 className="text-3xl font-bold mb-3" style={{ color: 'var(--color-text)' }}>
             {current.title}
           </h1>

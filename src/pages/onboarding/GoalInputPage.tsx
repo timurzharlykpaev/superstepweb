@@ -153,8 +153,12 @@ export default function GoalInputPage() {
       {/* Content */}
       <div className="flex-1 flex flex-col items-center justify-center px-6 min-h-0">
         {recordState === 'idle' && (
-          <div className="text-center mb-8 w-full max-w-sm">
-            <div className="text-5xl mb-4">🎙️</div>
+          <div className="text-center mb-6 w-full max-w-sm">
+            <img
+              src="/onboarding-voice.png"
+              alt="Voice input"
+              className="w-44 h-32 object-contain mx-auto mb-4 drop-shadow-xl"
+            />
             <h1 className="text-2xl font-bold mb-2" style={{ color: 'var(--color-text)' }}>
               Tell me about your goals
             </h1>
