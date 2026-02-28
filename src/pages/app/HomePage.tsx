@@ -64,8 +64,8 @@ function PageHeader({ user, renderAvatar }: { user: any; renderAvatar: () => Rea
 function BottomActions({ navigate }: { navigate: (p: string) => void }) {
   return (
     <div
-      className="flex-shrink-0 flex gap-3 p-4 border-t border-black/5 dark:border-white/5"
-      style={{ backgroundColor: 'var(--color-background)' }}
+      className="fixed bottom-16 left-0 right-0 flex gap-3 px-4 pb-2 md:static md:bottom-auto md:border-t md:border-black/5 md:dark:border-white/5 md:p-4 z-30"
+      style={{ backgroundColor: 'transparent' }}
     >
       <button
         onClick={() => navigate('/app/today')}
