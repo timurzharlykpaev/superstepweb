@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { Plus, CalendarBlank, Target, User } from '@phosphor-icons/react'
+import { Plus, Target, User } from '@phosphor-icons/react'
 import client from '../../api/client'
 
 interface GoalCube {
@@ -176,23 +176,7 @@ export default function HomePage() {
         )}
       </div>
 
-      {/* Bottom Action Buttons */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 flex gap-3 md:hidden" style={{ backgroundColor: 'var(--color-background)', borderTop: '1px solid var(--color-surface)' }}>
-        <button
-          onClick={() => navigate('/app/today')}
-          className="flex-1 flex items-center justify-center gap-2 h-12 rounded-xl font-semibold text-sm transition-colors bg-gradient-to-r from-green-500 to-cyan-500 text-white shadow-lg"
-        >
-          <CalendarBlank size={18} weight="bold" />
-          Today
-        </button>
-        <button
-          onClick={() => navigate('/app/goals')}
-          className="flex-1 flex items-center justify-center gap-2 h-12 rounded-xl font-semibold text-sm transition-colors bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg"
-        >
-          <Plus size={18} weight="bold" />
-          New Goal
-        </button>
-      </div>
+
     </div>
   )
 }
