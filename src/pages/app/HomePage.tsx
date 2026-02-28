@@ -143,7 +143,7 @@ export default function HomePage() {
   // Empty state
   if (!cubesLoading && !treeLoading && cubes.length === 0 && tree.length === 0) {
     return (
-      <div className="flex flex-col h-full" style={{ backgroundColor: 'var(--color-background)' }}>
+      <div className="min-h-full pb-36 md:pb-6" style={{ backgroundColor: 'var(--color-background)' }}>
         <PageHeader user={user} renderAvatar={renderAvatarOrEmoji} />
 
         {/* Empty state center */}
@@ -168,7 +168,7 @@ export default function HomePage() {
   }
 
   return (
-    <div className="flex flex-col h-full" style={{ backgroundColor: 'var(--color-background)' }}>
+    <div className="min-h-full pb-36 md:pb-6" style={{ backgroundColor: 'var(--color-background)' }}>
       <PageHeader user={user} renderAvatar={renderAvatarOrEmoji} />
       <div className="flex-1 overflow-y-auto p-4 md:p-6 pb-28 md:pb-6">
 
