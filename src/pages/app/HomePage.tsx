@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { Plus, Target, User } from '@phosphor-icons/react'
+import { Plus, Target, User, CalendarBlank } from '@phosphor-icons/react'
 import client from '../../api/client'
 
 interface GoalCube {
@@ -113,9 +113,10 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-full pb-24 md:pb-6" style={{ backgroundColor: 'var(--color-background)' }}>
+    <div className="min-h-full pb-36 md:pb-6" style={{ backgroundColor: 'var(--color-background)' }}>
       {/* Header */}
       <div className="p-4 md:p-6">
+        {/* Header row: greeting + action buttons */}
         <div className="flex items-center gap-3 mb-6">
           {renderAvatarOrEmoji()}
           <div className="flex-1">
@@ -124,7 +125,28 @@ export default function HomePage() {
               <h2 className="text-lg font-bold" style={{ color: 'var(--color-text)' }}>{user.nickname}</h2>
             )}
           </div>
+          {/* Action buttons — desktop only */}
+          <div className="hidden md:flex items-center gap-2">
+            <button
+              onClick={() => navigate('/app/today')}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl font-semibold text-sm text-white transition-colors"
+              style={{ background: 'linear-gradient(135deg, #10B981, #06B6D4)' }}
+            >
+              <CalendarBlank size={16} weight="bold" />
+              Today
+            </button>
+            <button
+              onClick={() => navigate('/app/goals')}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl font-semibold text-sm text-white transition-colors"
+              style={{ background: 'linear-gradient(135deg, #8B5CF6, #3B82F6)' }}
+            >
+              <Plus size={16} weight="bold" />
+              New Goal
+            </button>
+          </div>
         </div>
+
+        {/* Mobile floating action buttons — above bottom nav */}
 
         {/* Goal Cubes */}
         {cubes.length > 0 && (
@@ -176,7 +198,25 @@ export default function HomePage() {
         )}
       </div>
 
-
+      {/* Floating action buttons — mobile only, above bottom nav */}
+      <div className="md:hidden fixed bottom-20 left-4 right-4 flex gap-3 z-40">
+        <button
+          onClick={() => navigate('/app/today')}
+          className="flex-1 flex items-center justify-center gap-2 h-12 rounded-2xl font-semibold text-sm text-white shadow-lg transition-all active:scale-95"
+          style={{ background: 'linear-gradient(135deg, #10B981, #06B6D4)' }}
+        >
+          <CalendarBlank size={18} weight="bold" />
+          Today
+        </button>
+        <button
+          onClick={() => navigate('/app/goals')}
+          className="flex-1 flex items-center justify-center gap-2 h-12 rounded-2xl font-semibold text-sm text-white shadow-lg transition-all active:scale-95"
+          style={{ background: 'linear-gradient(135deg, #8B5CF6, #3B82F6)' }}
+        >
+          <Plus size={18} weight="bold" />
+          New Goal
+        </button>
+      </div>
     </div>
   )
 }
