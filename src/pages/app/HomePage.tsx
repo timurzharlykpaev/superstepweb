@@ -1,4 +1,6 @@
-import { useMemo } from 'react'
+import React from 'react' // eslint-disable-line
+import ThemeToggle from '../../components/ThemeToggle'
+import LangPickerInline from '../../components/LangPickerInline'
 import { useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { Plus, Target, User, CalendarBlank } from '@phosphor-icons/react'
@@ -32,16 +34,62 @@ interface UserInfo {
   avatarUrl?: string
 }
 
-function getGreeting(): string {
+
+
+// ── Reusable Header ─────────────────────────────────────────────────────────
+function PageHeader({ user, renderAvatar }: { user: any; renderAvatar: () => React.ReactNode }) {
   const hour = new Date().getHours()
-  if (hour < 12) return 'Good morning'
-  if (hour < 18) return 'Good afternoon'
-  return 'Good evening'
+  const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening'
+  return (
+    <div
+      className="flex items-center gap-3 px-4 py-3 border-b border-black/5 dark:border-white/5 flex-shrink-0"
+      style={{ backgroundColor: 'var(--color-surface)' }}
+    >
+      {renderAvatar()}
+      <div className="flex-1 min-w-0">
+        <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>{greeting}</p>
+        <h2 className="text-base font-bold truncate" style={{ color: 'var(--color-text)' }}>
+          {user?.nickname || user?.email?.split('@')[0] || 'Welcome'}
+        </h2>
+      </div>
+      <div className="flex items-center gap-1">
+        <LangPickerInline />
+        <ThemeToggle />
+      </div>
+    </div>
+  )
+}
+
+// ── Bottom Action Buttons ────────────────────────────────────────────────────
+function BottomActions({ navigate }: { navigate: (p: string) => void }) {
+  return (
+    <div
+      className="flex-shrink-0 flex gap-3 p-4 border-t border-black/5 dark:border-white/5"
+      style={{ backgroundColor: 'var(--color-background)' }}
+    >
+      <button
+        onClick={() => navigate('/app/today')}
+        className="flex-1 flex items-center justify-center gap-2 h-12 rounded-2xl font-semibold text-sm text-white shadow-md transition-all hover:opacity-90 active:scale-95"
+        style={{ background: 'linear-gradient(135deg, #10B981, #06B6D4)' }}
+      >
+        <CalendarBlank size={18} weight="bold" />
+        Today / Plan
+      </button>
+      <button
+        onClick={() => navigate('/app/goals')}
+        className="flex-1 flex items-center justify-center gap-2 h-12 rounded-2xl font-semibold text-sm text-white shadow-md transition-all hover:opacity-90 active:scale-95"
+        style={{ background: 'linear-gradient(135deg, #8B5CF6, #3B82F6)' }}
+      >
+        <Plus size={18} weight="bold" />
+        New Goal
+      </button>
+    </div>
+  )
 }
 
 export default function HomePage() {
   const navigate = useNavigate()
-  const greeting = useMemo(() => getGreeting(), [])
+  // greeting moved to PageHeader component
 
   const { data: cubes = [], isLoading: cubesLoading } = useQuery<GoalCube[]>({
     queryKey: ['goal-cubes'],
@@ -95,29 +143,11 @@ export default function HomePage() {
   // Empty state
   if (!cubesLoading && !treeLoading && cubes.length === 0 && tree.length === 0) {
     return (
-      <div className="flex flex-col min-h-full p-6" style={{ backgroundColor: 'var(--color-background)' }}>
-        {/* Action buttons always visible at top */}
-        <div className="flex gap-3 mb-8">
-          <button
-            onClick={() => navigate('/app/today')}
-            className="flex-1 flex items-center justify-center gap-2 h-12 rounded-2xl font-semibold text-sm text-white shadow-md transition-all hover:opacity-90"
-            style={{ background: 'linear-gradient(135deg, #10B981, #06B6D4)' }}
-          >
-            <CalendarBlank size={18} weight="bold" />
-            Today / Plan
-          </button>
-          <button
-            onClick={() => navigate('/app/goals')}
-            className="flex-1 flex items-center justify-center gap-2 h-12 rounded-2xl font-semibold text-sm text-white shadow-md transition-all hover:opacity-90"
-            style={{ background: 'linear-gradient(135deg, #8B5CF6, #3B82F6)' }}
-          >
-            <Plus size={18} weight="bold" />
-            New Goal
-          </button>
-        </div>
+      <div className="flex flex-col" style={{ height: '100%', backgroundColor: 'var(--color-background)' }}>
+        <PageHeader user={user} renderAvatar={renderAvatarOrEmoji} />
 
         {/* Empty state center */}
-        <div className="flex-1 flex flex-col items-center justify-center">
+        <div className="flex-1 flex flex-col items-center justify-center px-6">
           <Target size={64} weight="duotone" className="text-purple-400 mb-4" />
           <h2 className="text-2xl font-bold mb-2" style={{ color: 'var(--color-text)' }}>No goals yet</h2>
           <p className="text-center mb-6 max-w-xs" style={{ color: 'var(--color-text-muted)' }}>
@@ -131,45 +161,16 @@ export default function HomePage() {
             Create First Goal
           </button>
         </div>
+
+        <BottomActions navigate={navigate} />
       </div>
     )
   }
 
   return (
-    <div className="min-h-full pb-36 md:pb-6" style={{ backgroundColor: 'var(--color-background)' }}>
-      {/* Header */}
-      <div className="p-4 md:p-6">
-        {/* Header row: greeting + action buttons */}
-        <div className="flex items-center gap-3 mb-6">
-          {renderAvatarOrEmoji()}
-          <div className="flex-1">
-            <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>{greeting}</p>
-            {user?.nickname && (
-              <h2 className="text-lg font-bold" style={{ color: 'var(--color-text)' }}>{user.nickname}</h2>
-            )}
-          </div>
-          {/* Action buttons — desktop only */}
-          <div className="hidden md:flex items-center gap-2">
-            <button
-              onClick={() => navigate('/app/today')}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl font-semibold text-sm text-white transition-colors"
-              style={{ background: 'linear-gradient(135deg, #10B981, #06B6D4)' }}
-            >
-              <CalendarBlank size={16} weight="bold" />
-              Today
-            </button>
-            <button
-              onClick={() => navigate('/app/goals')}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl font-semibold text-sm text-white transition-colors"
-              style={{ background: 'linear-gradient(135deg, #8B5CF6, #3B82F6)' }}
-            >
-              <Plus size={16} weight="bold" />
-              New Goal
-            </button>
-          </div>
-        </div>
-
-        {/* Mobile floating action buttons — above bottom nav */}
+    <div className="flex flex-col" style={{ backgroundColor: 'var(--color-background)' }}>
+      <PageHeader user={user} renderAvatar={renderAvatarOrEmoji} />
+      <div className="flex-1 overflow-y-auto p-4 md:p-6 pb-28 md:pb-6">
 
         {/* Goal Cubes */}
         {cubes.length > 0 && (
@@ -220,26 +221,7 @@ export default function HomePage() {
           </div>
         )}
       </div>
-
-      {/* Floating action buttons — mobile only, above bottom nav */}
-      <div className="md:hidden fixed bottom-20 left-4 right-4 flex gap-3 z-40">
-        <button
-          onClick={() => navigate('/app/today')}
-          className="flex-1 flex items-center justify-center gap-2 h-12 rounded-2xl font-semibold text-sm text-white shadow-lg transition-all active:scale-95"
-          style={{ background: 'linear-gradient(135deg, #10B981, #06B6D4)' }}
-        >
-          <CalendarBlank size={18} weight="bold" />
-          Today
-        </button>
-        <button
-          onClick={() => navigate('/app/goals')}
-          className="flex-1 flex items-center justify-center gap-2 h-12 rounded-2xl font-semibold text-sm text-white shadow-lg transition-all active:scale-95"
-          style={{ background: 'linear-gradient(135deg, #8B5CF6, #3B82F6)' }}
-        >
-          <Plus size={18} weight="bold" />
-          New Goal
-        </button>
-      </div>
+      <BottomActions navigate={navigate} />
     </div>
   )
 }
