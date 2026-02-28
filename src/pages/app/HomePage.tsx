@@ -95,19 +95,42 @@ export default function HomePage() {
   // Empty state
   if (!cubesLoading && !treeLoading && cubes.length === 0 && tree.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-full p-6" style={{ backgroundColor: 'var(--color-background)' }}>
-        <Target size={64} weight="duotone" className="text-purple-400 mb-4" />
-        <h2 className="text-2xl font-bold mb-2" style={{ color: 'var(--color-text)' }}>No goals yet</h2>
-        <p className="text-center mb-6 max-w-xs" style={{ color: 'var(--color-text-muted)' }}>
-          Start your journey by creating your first goal
-        </p>
-        <button
-          onClick={() => navigate('/app/goals')}
-          className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-xl font-semibold transition-colors"
-        >
-          <Plus size={20} weight="bold" />
-          Create Goal
-        </button>
+      <div className="flex flex-col min-h-full p-6" style={{ backgroundColor: 'var(--color-background)' }}>
+        {/* Action buttons always visible at top */}
+        <div className="flex gap-3 mb-8">
+          <button
+            onClick={() => navigate('/app/today')}
+            className="flex-1 flex items-center justify-center gap-2 h-12 rounded-2xl font-semibold text-sm text-white shadow-md transition-all hover:opacity-90"
+            style={{ background: 'linear-gradient(135deg, #10B981, #06B6D4)' }}
+          >
+            <CalendarBlank size={18} weight="bold" />
+            Today / Plan
+          </button>
+          <button
+            onClick={() => navigate('/app/goals')}
+            className="flex-1 flex items-center justify-center gap-2 h-12 rounded-2xl font-semibold text-sm text-white shadow-md transition-all hover:opacity-90"
+            style={{ background: 'linear-gradient(135deg, #8B5CF6, #3B82F6)' }}
+          >
+            <Plus size={18} weight="bold" />
+            New Goal
+          </button>
+        </div>
+
+        {/* Empty state center */}
+        <div className="flex-1 flex flex-col items-center justify-center">
+          <Target size={64} weight="duotone" className="text-purple-400 mb-4" />
+          <h2 className="text-2xl font-bold mb-2" style={{ color: 'var(--color-text)' }}>No goals yet</h2>
+          <p className="text-center mb-6 max-w-xs" style={{ color: 'var(--color-text-muted)' }}>
+            Create your first goal to see it here as an interactive cube
+          </p>
+          <button
+            onClick={() => navigate('/app/goals')}
+            className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-xl font-semibold transition-colors"
+          >
+            <Plus size={20} weight="bold" />
+            Create First Goal
+          </button>
+        </div>
       </div>
     )
   }
